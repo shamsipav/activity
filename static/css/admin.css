@@ -1,0 +1,41 @@
+:root {
+    --text-color: black;
+    --container-width: 1320px;
+}
+
+
+.input {
+    padding: 0.5rem 0.8rem;
+    border-radius: 0.2rem;
+    border: 1px solid lightgray;
+    color: rgb(45, 6, 82);
+}
+
+.input:focus {
+    border: 1px solid blueviolet;
+}
+
+.button {
+    padding: 0.5rem 0.8rem;
+    background-color: blueviolet;
+    border-radius: 0.2rem;
+    color: white;
+    cursor: pointer;
+    transition: 0.15s ease;
+    border: 1px solid blueviolet;
+}
+
+.button:hover {
+    background-color: white;
+    color: blueviolet;
+}
+
+section {
+    padding-top: 7rem;
+}
+
+h1 {
+    font-size: 2rem;
+    font-weight: bold;
+    text-align: center;
+}
