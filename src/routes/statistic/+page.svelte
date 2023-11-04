@@ -1,6 +1,6 @@
 <script lang="ts">
-    import { ActivitiesOld } from "$components";
-    import type { IActivity } from "$lib/types";
+    import { ActivitiesOld } from '$components'
+    import type { IActivity } from '$lib/types'
     import type { PageData } from './$types'
 
     export let data: PageData

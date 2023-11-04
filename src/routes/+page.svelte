@@ -1,133 +1,103 @@
 <script lang="ts">
-    import { Activities, DateMenu, Notify } from "$components";
-    import type { IActivity, IFood } from "$lib/types";
+    import { Activities, DateMenuNew, Modal, Notify, Statistic } from '$components'
+    import type { IActivity, IFood, IModal, IStep } from '$lib/types'
+    import { getStats } from '$lib/utils'
     import type { PageData } from './$types'
 
+    let modal: IModal
     export let data: PageData
 
     let activities: IActivity[] = data.activities
-    let activitiesByDate: IActivity[] = data.activitiesByDate
-    let foodsByDate: IFood[] = data.foodsByDate
+    let allActivities: IActivity[] = data.allActivities
+    let foodsByDate: IFood[] = data?.foodsByDate || []
+    let steps: IStep[] = data?.steps || []
+
+    let stats = getStats(allActivities, foodsByDate, steps)
+    let averageReceivedCalories = stats.averageReceivedCalories
+    let averageSpentCalories = stats.averageSpentCalories
 
     let message = ''
 
-    const handleSubmit = async (e) => {
-        const formData = new FormData(e.target)
-        formData.append("date", new Date(activities[0]?.date).toLocaleDateString());
-        
+    let currentDate: Date = activities.length > 0 ? new Date(activities[0]?.date) : new Date()
+    const showActivitiesByDate = (event: any) => {
+        modal.close()
+        activities = event.detail.activitiesByDate
+        currentDate = event.detail.choosedDate
+        console.log('showActivitiesByDate currentDate: ', currentDate.toLocaleDateString())
+    
+    }
 
+    const getAllActivities = async () => {
         let response = await fetch('/api/database', {
-            method: 'POST',
+            method: 'GET',
             headers: { accept: 'application/json' },
-            body: formData
+        })
+
+        let responseSteps = await fetch('/api/steps', {
+            method: 'GET',
+            headers: { accept: 'application/json' },
+        })
+
+        let responseFoods = await fetch('/api/calories', {
+            method: 'GET',
+            headers: { accept: 'application/json' },
         })
 
         // TODO: Переделать логику с проверкой содержимого message, добавить error = false/true в Notify
-        if (response.ok) {
-            e.target.reset();
+        if (response.ok && responseSteps.ok && responseFoods.ok) {
+            allActivities = await response.json()
+            steps = await responseSteps.json()
+            foodsByDate = await responseFoods.json()
 
-            const newActivity = await response.json()
-            activities = [...activities, newActivity]
-
-            message = `Активность (${newActivity.date}) успешно добавлена!`
-            setTimeout(() => message = '', 2500)
+            let stats = getStats(allActivities, foodsByDate, steps)
+            averageReceivedCalories = stats.averageReceivedCalories
+            averageSpentCalories = stats.averageSpentCalories
+            console.log('Должна обновиться статистика')
         } else {
-            message = 'Возникла ошибка при добавлении активности'
+            message = 'Возникла ошибка при получении всех активностей'
             setTimeout(() => message = '', 2500)
         }
     }
 
-    const showActivitiesByDate = (event) => {
-        activities = event.detail
-        currentDate = new Date(activities[0]?.date).toLocaleDateString()
+    const updateSteps = (event: any) => {
+        console.log('updateStepsEvent target steps = ' + event.detail.steps)
+    
+        let currentStep: any = steps.find(s => new Date(s.date).toLocaleDateString() == currentDate.toLocaleDateString())
+        if (currentStep)
+            currentStep.steps = event.detail.steps
     }
 
-    let currentDate = new Date(activities[0]?.date).toLocaleDateString()
-    let caloriesForm: HTMLFormElement
-    const handleCaloriesSubmit = async (e) => {
-        const formData = new FormData(e.target)
-        formData.append("date", currentDate);       
-
-        let response = await fetch('/api/calories', {
-            method: 'POST',
-            headers: { accept: 'application/json' },
-            body: formData
-        })
-
-        // TODO: Переделать логику с проверкой содержимого message, добавить error = false/true в Notify
-        if (response.ok) {
-            const newCalories: IFood = await response.json()
-
-            message = `Калории (${newCalories.date}) успешно обновлены!`
-            setTimeout(() => message = '', 2500)
-        } else {
-            message = 'Возникла ошибка при обновлении калорий'
-            setTimeout(() => message = '', 2500)
-        }
+    const updateCalories = (event: any) => {
+        console.log('updateCalories target calories = ' + event.detail.calories)
+    
+        let currentFood: any = foodsByDate.find(f => new Date(f.date).toLocaleDateString() == currentDate.toLocaleDateString())
+        if (currentFood)
+            currentFood.calories = event.detail.calories
     }
 
-    $: currentDateCalories = foodsByDate.find(x => new Date(x.date).toLocaleDateString() == currentDate)?.calories
-
+    const notifyHandler = (event: any) => {
+        message = event.detail.message
+        setTimeout(() => message = '', 2500)
+    }
 </script>
 
-<section class="main">
+<Modal bind:this={modal} hasFooter={false} title={'Modal'}>
+    <DateMenuNew choosedDate={currentDate} on:update={showActivitiesByDate}>
+        <Statistic choosedDate={currentDate} {averageReceivedCalories} {averageSpentCalories} type="calendar" />
+    </DateMenuNew>
+</Modal>
+
+<section class="main">     
     <div class="container">
-        <h1>Калькулятор активностей</h1>   
-        <form class="main__form" on:submit|preventDefault={handleSubmit}>
-            <input class="input" type="text" name="duration" placeholder="Время бега, мин." required autocomplete="off">
-            <input class="input" type="text" name="speed" placeholder="Скорость бега, км/час." required autocomplete="off">
-            <button class="button">Добавить</button>
-        </form>
-        {#if activities?.length > 0}           
-            <Activities {activities} />
-            <form class="calories__form" on:submit|preventDefault={handleCaloriesSubmit} bind:this={caloriesForm}>
-                <p>Употреблено в пищу</p>
-                <input 
-                    class="calories__input" type="text" name="calories" placeholder="Количество ккал." required autocomplete="off" 
-                    on:change={() => caloriesForm.requestSubmit()} value={currentDateCalories}
-                >
-                <span>ккал.</span>
-            </form>
-        {:else}
-            <p class="label">Сегодня еще не было активностей</p>
-        {/if}
-        <DateMenu activities={activitiesByDate} on:update={showActivitiesByDate} />
+        <Activities {activities} {currentDate} {steps} foods = {foodsByDate} 
+            on:added={getAllActivities} 
+            on:updated={getAllActivities} 
+            on:updatesteps={updateSteps} 
+            on:updatefood={updateCalories}
+            on:notify={notifyHandler}
+            on:calendar={modal.open}
+        />
     </div>
 </section>
 
 <Notify text={message} />
-
-<style>
-    .main__form {
-        margin-top: 3rem;
-        text-align: center;
-    }
-
-    .label {
-        text-align: center;
-        margin-top: 2rem;
-        font-size: 1.1rem;
-    }
-
-    .calories__form {
-        margin-top: 1rem;
-        font-size: 1.1rem;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .calories__input {
-        font-size: 1.1rem;
-        padding: 0.2rem;
-        margin: 0 0.5rem;
-        text-align: center;
-        max-width: 4rem;
-        border: 1px solid white;
-        border-radius: 0.2rem;
-    }
-
-    .calories__input:focus, .calories__input:hover {
-        border: 1px solid blueviolet;
-    }
-</style>

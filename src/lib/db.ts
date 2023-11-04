@@ -1,4 +1,4 @@
-import { Pool } from 'pg';
+import { Pool } from 'pg'
 import { env } from '$env/dynamic/private'
 
 const dbConfig = {
@@ -8,16 +8,16 @@ const dbConfig = {
     password: env.PASSWORD,
     database: env.DATABASE,
 }
-  
 
-const pool = new Pool(dbConfig);
+
+const pool = new Pool(dbConfig)
 
 export async function query(text: string, params: any) {
-    const client = await pool.connect();
+    const client = await pool.connect()
     try {
-        const result = await client.query(text, params);
-        return result;
+        const result = await client.query(text, params)
+        return result
     } finally {
-        client.release();
+        client.release()
     }
 }

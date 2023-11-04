@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { fade } from "svelte/transition";
+    import { fade } from 'svelte/transition'
 
     export let text: string
 </script>
@@ -12,16 +12,14 @@
 
 <style>
     .notify {
-        font-family: Mont;
-        position: absolute;
+        position: fixed;
         right: 0.9rem;
         z-index: 5;
-        background-color: blueviolet;
+        font-size: 1.8rem;
+        background-color: #F5FCA5;
         border-radius: 0.5rem;
-        border: 1px solid lightgray;
-        padding: 1rem 2rem;
+        padding: 0.3rem 1rem;
         bottom: 1rem;
         max-width: fit-content;
-        color: white;
     }
 </style>

@@ -9,3 +9,14 @@ export interface IFood {
     calories: number;
     date: Date
 }
+
+export interface IStep {
+    steps: number;
+    date: Date
+}
+
+export interface IModal {
+    open: () => void,
+    close: () => void,
+    toggle: () => void
+}
