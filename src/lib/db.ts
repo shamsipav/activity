@@ -4,7 +4,7 @@ const { Pool } = pkg
 
 const dbConfig = {
     host: '172.24.176.61',
-    port: '5432',
+    port: '5402',
     user: 'postgres',
     password:'postgresroot',
     database: 'activity',
