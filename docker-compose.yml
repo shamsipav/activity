@@ -15,4 +15,4 @@ services:
   frontend:
     build: ./activity
     ports:
-      - 5401:5401
+      - 80:80
