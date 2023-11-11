@@ -16,5 +16,3 @@ services:
     build: ./teplo-client
     ports:
       - 5401:5401
-    depends_on:
-      - api
