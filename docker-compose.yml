@@ -13,6 +13,6 @@ services:
       - "0.0.0.0:5402:5432"
 
   frontend:
-    build: ./teplo-client
+    build: ./activity
     ports:
       - 5401:5401
