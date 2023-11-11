@@ -214,7 +214,6 @@
     </div>
     {#each activities as activity}
         <div>
-            <p>{activity.id}</p>
             <!-- svelte-ignore a11y-click-events-have-key-events -->
             <div class="activity" transition:fade>
                 <input class="activity__input" name="speed" type="text" bind:value={activity.speed} on:change={() => updateHandler(activity)}/>
@@ -268,7 +267,7 @@
     .activities__heading {
         font-size: 48px;
         text-align: center;
-        margin-bottom: 1rem;
+        margin-bottom: 2rem;
     }
 
     .create {

@@ -9,7 +9,11 @@
 
     let show = false
 
+    // For change mounths
     export let choosedDate: Date = new Date()
+
+    let currentDate = choosedDate
+
     const getActivitiesByDate = async (date: Date, dispatched = true) => {
         choosedDate = date
 
@@ -57,7 +61,8 @@
         if (newDate.getMonth() === choosedDate.getMonth()) {
             getActivitiesByDate(choosedDate, false)
         } else {
-            getActivitiesByDate(newDate, false)
+            choosedDate = newDate
+            dispatch('month', { choosedDate })
         }
     }
 </script>
@@ -80,7 +85,7 @@
     <div class="dates">
         {#each dates as date}
             <!-- svelte-ignore a11y-click-events-have-key-events -->
-            <div class="date" on:click={() => getActivitiesByDate(date)} class:active={choosedDate.toLocaleDateString() == date.toLocaleDateString()}>
+            <div class="date" on:click={() => getActivitiesByDate(date)} class:active={currentDate.toLocaleDateString() == date.toLocaleDateString()}>
                 <p>{date.getDate()}</p>
             </div>
         {/each}

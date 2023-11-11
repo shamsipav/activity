@@ -3,7 +3,7 @@
     const dispatch = createEventDispatcher()
 
     export let type: 'calendar' | 'row' = 'calendar'
-    export let choosedDate: Date
+    export let currentDateForStats: Date
 
     export let averageReceivedCalories: number
     export let averageSpentCalories: number
@@ -11,7 +11,7 @@
 
 <div class="stat stat-{type}">
     {#if type === 'calendar'}
-        <p class="label">Среднее значение за {choosedDate.toLocaleString('default', { month: 'long' })}:</p>
+        <p class="label">Среднее значение за {currentDateForStats.toLocaleString('default', { month: 'long' })}:</p>
         <div class="values">
             <div class="values-flex">            
                 <svg width="30" height="30" viewBox="0 0 57 57" fill="none" xmlns="http://www.w3.org/2000/svg">

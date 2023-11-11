@@ -1,5 +1,6 @@
 <script lang="ts">
     import { Activities, DateMenuNew, Modal, Notify, Statistic } from '$components'
+    import { choosedDateInStore } from '$lib/stores';
     import type { IActivity, IFood, IModal, IStep } from '$lib/types'
     import { getStats } from '$lib/utils'
     import type { PageData } from './$types'
@@ -12,19 +13,24 @@
     let foodsByDate: IFood[] = data?.foodsByDate || []
     let steps: IStep[] = data?.steps || []
 
-    let stats = getStats(allActivities, foodsByDate, steps)
-    let averageReceivedCalories = stats.averageReceivedCalories
-    let averageSpentCalories = stats.averageSpentCalories
-
     let message = ''
 
     let currentDate: Date = activities.length > 0 ? new Date(activities[0]?.date) : new Date()
+
+    let stats = getStats(allActivities, foodsByDate, steps, currentDate)
+    let averageReceivedCalories = stats.averageReceivedCalories
+    let averageSpentCalories = stats.averageSpentCalories
+
     const showActivitiesByDate = (event: any) => {
         modal.close()
         activities = event.detail.activitiesByDate
         currentDate = event.detail.choosedDate
+
+        stats = getStats(allActivities, foodsByDate, steps, currentDate)
+        averageReceivedCalories = stats.averageReceivedCalories
+        averageSpentCalories = stats.averageSpentCalories
+
         console.log('showActivitiesByDate currentDate: ', currentDate.toLocaleDateString())
-    
     }
 
     const getAllActivities = async () => {
@@ -49,9 +55,10 @@
             steps = await responseSteps.json()
             foodsByDate = await responseFoods.json()
 
-            let stats = getStats(allActivities, foodsByDate, steps)
+            let stats = getStats(allActivities, foodsByDate, steps, currentDate)
             averageReceivedCalories = stats.averageReceivedCalories
             averageSpentCalories = stats.averageSpentCalories
+
             console.log('Должна обновиться статистика')
         } else {
             message = 'Возникла ошибка при получении всех активностей'
@@ -79,11 +86,19 @@
         message = event.detail.message
         setTimeout(() => message = '', 2500)
     }
+
+    let currentDateForStats: Date = new Date()
+    const changeMonthHandler = (event: any) => {
+        currentDateForStats = event.detail.choosedDate
+        let stats = getStats(allActivities, foodsByDate, steps, currentDateForStats)
+        averageReceivedCalories = stats.averageReceivedCalories
+        averageSpentCalories = stats.averageSpentCalories
+    }
 </script>
 
 <Modal bind:this={modal} hasFooter={false} title={'Modal'}>
-    <DateMenuNew choosedDate={currentDate} on:update={showActivitiesByDate}>
-        <Statistic choosedDate={currentDate} {averageReceivedCalories} {averageSpentCalories} type="calendar" />
+    <DateMenuNew choosedDate={currentDate} on:update={showActivitiesByDate} on:month={changeMonthHandler}>
+        <Statistic {currentDateForStats} {averageReceivedCalories} {averageSpentCalories} type="calendar" />
     </DateMenuNew>
 </Modal>
 

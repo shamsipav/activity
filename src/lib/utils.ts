@@ -1,6 +1,11 @@
 import type { IActivity, IFood, IStep } from './types'
 
-export const getStats = (allActivities: IActivity[], foodsByDate: IFood[], steps: IStep[]) => {
+export const getStats = (allActivities: IActivity[], foodsByDate: IFood[], steps: IStep[], choosedDate: Date) => {
+    
+    allActivities = filteredListByMonth(allActivities, choosedDate.getMonth())
+    foodsByDate = filteredListByMonth(foodsByDate, choosedDate.getMonth())
+    steps = filteredListByMonth(steps, choosedDate.getMonth())
+
     const groupedActivities = allActivities.reduce((result, activity) => {
         const dateString = new Date(activity.date)
         if (result[dateString]) {
@@ -30,11 +35,6 @@ export const getStats = (allActivities: IActivity[], foodsByDate: IFood[], steps
         return totalCalories
     }
 
-    const foodInDay = (date: Date) => {
-        const finedFood = foodsByDate.find(f => new Date(f.date).toLocaleDateString() == new Date(date).toLocaleDateString())
-        return +finedFood?.calories || 0
-    }
-
     const stepsInDay = (date: Date) => {
         if (steps) {
             const finedSteps = steps.find(f => new Date(f.date).toLocaleDateString() == new Date(date).toLocaleDateString())
@@ -54,30 +54,37 @@ export const getStats = (allActivities: IActivity[], foodsByDate: IFood[], steps
     console.log('Start utils GetStats debug:')
     console.log('----------------------------')
 
-    Object.entries(groupedActivities).forEach(([date, activities]) => {
-        const foodInDate = foodInDay(activities[0]?.date)
-        console.log('foodInDate: ', foodInDate)
-        if (foodInDate > 0) {
-            totalReceivedCalories += foodInDate
-            receivedCount++
-        }
+    console.log('');
+    
+    console.log('filtered allActivities: ', allActivities)
+    console.log('filtered foodsByDate: ', foodsByDate)
+    console.log('filtered steps: ', steps)
 
+    console.log('');
+    
+
+    Object.entries(groupedActivities).forEach(([date, activities]) => {
         const caloriesInDate = calculateTotalCalories(activities)
         console.log('caloriesInDate: ', caloriesInDate)
         if (caloriesInDate > 0) {
             totalSpentCalories += caloriesInDate
             spentCount++
         }
+    })
 
-        const stepsInDate = stepsInDay(activities[0]?.date)
-        console.log('stepsInDate: ', stepsInDate)
-        if (stepsInDate > 0) {
-            totalSpentStepCalories += stepsInDate
-            spentStepCount++
+    foodsByDate.forEach(f => {
+        if (f.calories > 0) {
+            totalReceivedCalories += f.calories
+            receivedCount++
         }
     })
 
-    console.log('')
+    steps.forEach(s => {
+        if (s.steps > 0) {
+            totalSpentStepCalories += stepsInDay(s.date)
+            spentStepCount++
+        }
+    })
 
     // TODO: Сделать адекватные названия
     const averageReceivedCalories = totalReceivedCalories ? Math.round(totalReceivedCalories / receivedCount) : 0
@@ -94,4 +101,8 @@ export const getStats = (allActivities: IActivity[], foodsByDate: IFood[], steps
     console.log('----------------------------')
 
     return { averageReceivedCalories, averageSpentCalories: averageSpentStepCalories + averageSpentTrainCalories }
+}
+
+const filteredListByMonth = (list: any[], month: number) => {
+    return list.filter(x => new Date(x.date).getMonth() == month)
 }

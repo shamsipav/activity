@@ -1,14 +1,21 @@
-import { Pool } from 'pg'
-import { env } from '$env/dynamic/private'
+import pkg from 'pg'
+
+const { Pool } = pkg
 
 const dbConfig = {
-    host: env.HOST,
-    port: env.PORT,
-    user: env.LOGIN,
-    password: env.PASSWORD,
-    database: env.DATABASE,
+    host: 'localhost',
+    port: '5432',
+    user: 'postgres',
+    password:'postgresroot',
+    database: 'activity',
+    // host: 'postgres.c74073.h2',
+    // port: '5432',
+    // user: 'c74073_activity_na4u_ru',
+    // password: 'YiPyuQemnabaq31',
+    // database: 'c74073_activity_na4u_ru'
 }
 
+console.log(dbConfig)
 
 const pool = new Pool(dbConfig)
 
