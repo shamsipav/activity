@@ -14,5 +14,5 @@ COPY package.json .
 EXPOSE 3000
 ENV NODE_ENV=production
 ENV PORT=3000
-ENV ORIGIN=http://localhost:3000
+ENV ORIGIN=http://172.24.176.61:3000
 CMD [ "node", "build" ]
