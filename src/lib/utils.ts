@@ -51,21 +51,24 @@ export const getStats = (allActivities: IActivity[], foodsByDate: IFood[], steps
     let spentCount = 0
     let spentStepCount = 0
 
-    console.log('Start utils GetStats debug:')
-    console.log('----------------------------')
+    let debug = false
 
-    console.log('');
+    if (debug) {
+        console.log('Start utils GetStats debug:')
+        console.log('----------------------------')
     
-    console.log('filtered allActivities: ', allActivities)
-    console.log('filtered foodsByDate: ', foodsByDate)
-    console.log('filtered steps: ', steps)
-
-    console.log('');
+        console.log('');
+        
+        console.log('filtered allActivities: ', allActivities)
+        console.log('filtered foodsByDate: ', foodsByDate)
+        console.log('filtered steps: ', steps)
+    
+        console.log('');
+    }
     
 
     Object.entries(groupedActivities).forEach(([date, activities]) => {
         const caloriesInDate = calculateTotalCalories(activities)
-        console.log('caloriesInDate: ', caloriesInDate)
         if (caloriesInDate > 0) {
             totalSpentCalories += caloriesInDate
             spentCount++
@@ -91,14 +94,16 @@ export const getStats = (allActivities: IActivity[], foodsByDate: IFood[], steps
     const averageSpentTrainCalories = totalSpentCalories ? Math.round(totalSpentCalories / spentCount) : 0
     const averageSpentStepCalories = totalSpentStepCalories ? Math.round(totalSpentStepCalories / spentStepCount) : 0
 
-    console.log('averageReceivedCalories: ', averageReceivedCalories)
-    console.log('averageSpentCalories: ', averageSpentTrainCalories)
-    console.log('averageSpentStepCalories: ', averageSpentStepCalories)
-
-    console.log('')
-
-    console.log('End utils GetStats debug:')
-    console.log('----------------------------')
+    if (debug) {
+        console.log('averageReceivedCalories: ', averageReceivedCalories)
+        console.log('averageSpentCalories: ', averageSpentTrainCalories)
+        console.log('averageSpentStepCalories: ', averageSpentStepCalories)
+    
+        console.log('')
+    
+        console.log('End utils GetStats debug:')
+        console.log('----------------------------')
+    }
 
     return { averageReceivedCalories, averageSpentCalories: averageSpentStepCalories + averageSpentTrainCalories }
 }

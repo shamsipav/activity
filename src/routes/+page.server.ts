@@ -9,8 +9,6 @@ export async function load() {
         const allActivities: IActivity[] = await query('SELECT * FROM public.activities ORDER BY date DESC')
         const steps: IStep[] = await query('SELECT * FROM public.steps ORDER BY date DESC')
 
-        console.log(await query('SELECT * FROM public.activities WHERE date = CURRENT_DATE'));
-
         return {
             activities: result.rows,
             foodsByDate: foodsByDate.rows,

@@ -17,6 +17,8 @@
     const getActivitiesByDate = async (date: Date, dispatched = true) => {
         choosedDate = date
 
+        // TODO: Сделай так, чтобы в запросе к api/date/{date} возвращался объект, где есть
+        // все активности за день, все шаги за день, и все калории полученные за день
         let response = await fetch(`api/date/${new Date(date).toLocaleDateString()}`, {
             method: 'GET',
         })
@@ -45,7 +47,7 @@
         const month = choosedDate.getMonth()
 
         generateDates(year, month)
-        console.log('DateMenu mounted')
+        //console.log('DateMenu mounted')
     })
 
     function changeMonth(month: number) {

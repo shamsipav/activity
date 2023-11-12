@@ -13,6 +13,13 @@
     let foodsByDate: IFood[] = data?.foodsByDate || []
     let steps: IStep[] = data?.steps || []
 
+    console.log('+page.server.ts completed queries')
+    console.log('activities: ', activities)
+    console.log('allActivities: ', allActivities)
+    console.log('foodsByDate: ', foodsByDate)
+    console.log('steps: ', steps)
+    console.log('')
+
     let message = ''
 
     let currentDate: Date = activities.length > 0 ? new Date(activities[0]?.date) : new Date()
@@ -30,7 +37,9 @@
         averageReceivedCalories = stats.averageReceivedCalories
         averageSpentCalories = stats.averageSpentCalories
 
-        console.log('showActivitiesByDate currentDate: ', currentDate.toLocaleDateString())
+        console.log(`+page.svelte: showActivitiesByDate(${currentDate.toLocaleDateString()}) completed`)
+        console.log('activities: ', activities)
+        console.log('')
     }
 
     const getAllActivities = async () => {
@@ -58,9 +67,17 @@
             let stats = getStats(allActivities, foodsByDate, steps, currentDate)
             averageReceivedCalories = stats.averageReceivedCalories
             averageSpentCalories = stats.averageSpentCalories
-
-            console.log('Должна обновиться статистика')
-        } else {
+            
+            console.log('+page.svelte: getAllActivities() completed')      
+            console.log('allActivities: ', allActivities)   
+            console.log('steps: ', steps)
+            console.log('foodsByDate: ', foodsByDate)
+            console.log('averageRecievedCalories in this month: ', averageReceivedCalories) 
+            console.log('averageSpentCalories in this month: ', averageSpentCalories) 
+            console.log('')       
+        } 
+        else 
+        {
             message = 'Возникла ошибка при получении всех активностей'
             setTimeout(() => message = '', 2500)
         }
@@ -93,6 +110,11 @@
         let stats = getStats(allActivities, foodsByDate, steps, currentDateForStats)
         averageReceivedCalories = stats.averageReceivedCalories
         averageSpentCalories = stats.averageSpentCalories
+
+        console.log('+page.svelte: changeMonthHandler completed')  
+        console.log('averageReceivedCalories: ', averageReceivedCalories)  
+        console.log('averageSpentCalories: ', averageSpentCalories)
+        console.log('')
     }
 </script>
 

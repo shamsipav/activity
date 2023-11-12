@@ -3,8 +3,8 @@ import pkg from 'pg'
 const { Pool } = pkg
 
 const dbConfig = {
-    host: '172.24.176.61',
-    port: '5402',
+    host: 'localhost',
+    port: '5432',
     user: 'postgres',
     password:'postgresroot',
     database: 'activity',
@@ -15,7 +15,7 @@ const dbConfig = {
     // database: 'c74073_activity_na4u_ru'
 }
 
-console.log(dbConfig)
+//console.log(dbConfig)
 
 const pool = new Pool(dbConfig)
 
