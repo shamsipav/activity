@@ -20,3 +20,10 @@ export interface IModal {
     close: () => void,
     toggle: () => void
 }
+
+export interface IUnion {
+    steps: IStep[]
+    foods: IFood[]
+    activities: IActivity[]
+    date: Date | undefined
+}

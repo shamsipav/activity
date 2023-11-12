@@ -1,11 +1,9 @@
 <script lang="ts">
-    import type { IActivity } from '$lib/types'
+    import type { IActivity, IUnion } from '$lib/types'
     import { createEventDispatcher } from 'svelte'
     import { onMount } from 'svelte'
 
     const dispatch = createEventDispatcher()
-
-    let activitiesByDate: IActivity[] = []
 
     let show = false
 
@@ -24,9 +22,10 @@
         })
 
         if (response.ok) {
-            activitiesByDate = await response.json()
+            let unionObject: IUnion = await response.json()
+            unionObject.date = choosedDate
             if (dispatched) {
-                dispatch('update', { activitiesByDate, choosedDate })
+                dispatch('update', { unionObject })
             }
         }
     }

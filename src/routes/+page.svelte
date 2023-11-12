@@ -1,7 +1,7 @@
 <script lang="ts">
     import { Activities, DateMenuNew, Modal, Notify, Statistic } from '$components'
     import { choosedDateInStore } from '$lib/stores';
-    import type { IActivity, IFood, IModal, IStep } from '$lib/types'
+    import type { IActivity, IFood, IModal, IStep, IUnion } from '$lib/types'
     import { getStats } from '$lib/utils'
     import type { PageData } from './$types'
 
@@ -30,8 +30,11 @@
 
     const showActivitiesByDate = (event: any) => {
         modal.close()
-        activities = event.detail.activitiesByDate
-        currentDate = event.detail.choosedDate
+        const unionObject: IUnion = event.detail.unionObject
+        activities = unionObject.activities
+        currentDate = unionObject.date
+        steps = unionObject.steps
+        foodsByDate = unionObject.foods
 
         stats = getStats(allActivities, foodsByDate, steps, currentDate)
         averageReceivedCalories = stats.averageReceivedCalories
@@ -39,6 +42,8 @@
 
         console.log(`+page.svelte: showActivitiesByDate(${currentDate.toLocaleDateString()}) completed`)
         console.log('activities: ', activities)
+        console.log('steps: ', steps)
+        console.log('foodsByDate: ', foodsByDate)
         console.log('')
     }
 
@@ -111,7 +116,7 @@
         averageReceivedCalories = stats.averageReceivedCalories
         averageSpentCalories = stats.averageSpentCalories
 
-        console.log('+page.svelte: changeMonthHandler completed')  
+        console.log('+page.svelte: changeMonthHandler completed - ', currentDateForStats.toLocaleString('default', { month: 'long' }))  
         console.log('averageReceivedCalories: ', averageReceivedCalories)  
         console.log('averageSpentCalories: ', averageSpentCalories)
         console.log('')
