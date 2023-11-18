@@ -1,5 +1,6 @@
 <script lang="ts">
     import type { IActivity, IUnion } from '$lib/types'
+    import { getLocalISOTimeString } from '$lib/utils';
     import { createEventDispatcher } from 'svelte'
     import { onMount } from 'svelte'
 
@@ -17,7 +18,7 @@
 
         // TODO: Сделай так, чтобы в запросе к api/date/{date} возвращался объект, где есть
         // все активности за день, все шаги за день, и все калории полученные за день
-        let response = await fetch(`api/date/${new Date(date).toLocaleDateString()}`, {
+        let response = await fetch(`api/date/${getLocalISOTimeString(date)}`, {
             method: 'GET',
         })
 

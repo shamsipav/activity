@@ -111,3 +111,9 @@ export const getStats = (allActivities: IActivity[], foodsByDate: IFood[], steps
 const filteredListByMonth = (list: any[], month: number) => {
     return list.filter(x => new Date(x.date).getMonth() == month)
 }
+
+export const getLocalISOTimeString = (date: Date) => {
+    return new Date(date.getTime() - (date.getTimezoneOffset() * 60000)).toISOString();
+}
+
+export const replaceCommaWithDot = (inputString: string) => inputString.replace(/,/g, '.');

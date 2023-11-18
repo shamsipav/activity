@@ -2,6 +2,7 @@
     import type { IActivity, IFood, IStep } from '$lib/types'
     import { fade } from 'svelte/transition'
     import { createEventDispatcher } from 'svelte'
+    import { getLocalISOTimeString, replaceCommaWithDot } from '$lib/utils';
 
     const dispatch = createEventDispatcher()
 
@@ -20,8 +21,12 @@
     $: totalBurnedOfDay = trainCalories + stepsCalories
 
     let message = ''
+    
+    let speedInputValue: string
+    let durationInputValue: string
 
     const calculateBurnedCalories = (duration: number, speed: number) => {
+        speed = +replaceCommaWithDot(speed)
         const met = interpolate(speed, [4.8, 8.5], [2.5, 4.9])
         return Math.round(48 * met * 0.0175 * duration)
     }
@@ -94,7 +99,7 @@
 
     const handleSubmit = async (e: any) => {
         const formData = new FormData(e.target)
-        formData.append('date', new Date(currentDate).toLocaleDateString())
+        formData.append('date', getLocalISOTimeString(currentDate))
 
         let response = await fetch('/api/database', {
             method: 'POST',
@@ -104,13 +109,15 @@
 
         // TODO: Переделать логику с проверкой содержимого message, добавить error = false/true в Notify
         if (response.ok) {
+            speedInputValue = null;
+            durationInputValue = null;
             e.target.reset()
 
             const newActivity = await response.json()
             activities = [...activities, newActivity]
 
             dispatch('added')
-            dispatch('notify', { message: `Активность (${newActivity.date}) успешно добавлена!` })
+            dispatch('notify', { message: `Активность (${newActivity.date.toLocaleDateString()}) успешно добавлена!` })
         } else {
             dispatch('notify', { message: 'Возникла ошибка при добавлении активности' })
         }
@@ -118,7 +125,7 @@
 
     const handleStepForm = async (e: any) => {
         const formData = new FormData(e.target)
-        formData.append('date', new Date(currentDate).toLocaleDateString())
+        formData.append('date', getLocalISOTimeString(currentDate))
 
     
         let response = await fetch('/api/steps', {
@@ -133,7 +140,7 @@
             console.log(newSteps)
             dispatch('updated')
             dispatch('updatesteps', { steps: newSteps.steps })
-            dispatch('notify', { message: `Шаги (${newSteps.date}) успешно добавлены!` })
+            dispatch('notify', { message: `Шаги (${newSteps.date.toLocaleDateString()}) успешно добавлены!` })
 
             stepsCalories = 0.5 * 48 * newSteps.steps
 
@@ -144,7 +151,7 @@
 
     const handleCaloriesSubmit = async (e) => {
         const formData = new FormData(e.target)
-        formData.append('date', currentDate.toLocaleDateString())
+        formData.append('date', getLocalISOTimeString(currentDate))
 
         let response = await fetch('/api/calories', {
             method: 'POST',
@@ -157,7 +164,7 @@
             const newCalories: IFood = await response.json()
             dispatch('updated')
             dispatch('updatefood', { calories: newCalories.calories })
-            dispatch('notify', { message: `Калории (${newCalories.date}) успешно обновлены!` })
+            dispatch('notify', { message: `Калории (${newCalories.date.toLocaleDateString()}) успешно обновлены!` })
         } else {
             dispatch('notify', { message: 'Возникла ошибка при обновлении калорий' })
         }
@@ -196,8 +203,8 @@
                 </defs>
                 </svg>                              
             <input 
-                class="calories__input" type="text" name="calories" placeholder="Количество ккал." required autocomplete="off" 
-                on:change={() => caloriesForm.requestSubmit()} value={currentDateFoodCalories ? currentDateFoodCalories : '0'}
+                class="calories__input" type="text" name="calories" required autocomplete="off" 
+                on:change={() => caloriesForm.requestSubmit()} value={currentDateFoodCalories ? currentDateFoodCalories : ''}
             >
             <p>ккал</p>
         </form>
@@ -233,31 +240,29 @@
         </div>
     {/each}
     <form class="activity" transition:fade on:submit|preventDefault={handleSubmit}>
-        <input class="activity__input" type="text" name="speed" required autocomplete="off">
-        <input class="activity__input" type="text" name="duration" required autocomplete="off">
-        <!-- <p class="calories">{calculateBurnedCalories(activity.duration, activity.speed)}</p> -->
-        <div class="item">
-            <button class="create">         
-                <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <g clip-path="url(#clip0_312_58)">
-                    <path d="M14 0C6.28075 0 0 6.28075 0 14C0 21.7192 6.28075 28 14 28C21.7192 28 28 21.7192 28 14C28 6.28075 21.7192 0 14 0ZM14 27.125C6.76288 27.125 0.875 21.2371 0.875 14C0.875 6.76288 6.76288 0.875 14 0.875C21.2371 0.875 27.125 6.76288 27.125 14C27.125 21.2371 21.2371 27.125 14 27.125Z" fill="#6B6D73"/>
-                    <path d="M20.5625 14H14.875V7.4375C14.875 7.196 14.679 7 14.4375 7C14.196 7 14 7.196 14 7.4375V14H7.4375C7.196 14 7 14.196 7 14.4375C7 14.679 7.196 14.875 7.4375 14.875H14V20.5625C14 20.804 14.196 21 14.4375 21C14.679 21 14.875 20.804 14.875 20.5625V14.875H20.5625C20.804 14.875 21 14.679 21 14.4375C21 14.196 20.804 14 20.5625 14Z" fill="#6B6D73"/>
-                    </g>
-                    <defs>
-                    <clipPath id="clip0_312_58">
-                    <rect width="28" height="28" fill="white"/>
-                    </clipPath>
-                    </defs>
-                </svg>
-            </button>
-        </div>
+        <input class="activity__input" type="text" name="speed" on:change={(e) => speedInputValue = e.target.value} required autocomplete="off">
+        <input class="activity__input" type="text" name="duration" on:change={(e) => durationInputValue = e.target.value} required autocomplete="off">
+        <p class="calories">{durationInputValue && speedInputValue ? calculateBurnedCalories(durationInputValue, speedInputValue) : 0}</p>
+        <button class="create">         
+            <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <g clip-path="url(#clip0_312_58)">
+                <path d="M14 0C6.28075 0 0 6.28075 0 14C0 21.7192 6.28075 28 14 28C21.7192 28 28 21.7192 28 14C28 6.28075 21.7192 0 14 0ZM14 27.125C6.76288 27.125 0.875 21.2371 0.875 14C0.875 6.76288 6.76288 0.875 14 0.875C21.2371 0.875 27.125 6.76288 27.125 14C27.125 21.2371 21.2371 27.125 14 27.125Z" fill="#6B6D73"/>
+                <path d="M20.5625 14H14.875V7.4375C14.875 7.196 14.679 7 14.4375 7C14.196 7 14 7.196 14 7.4375V14H7.4375C7.196 14 7 14.196 7 14.4375C7 14.679 7.196 14.875 7.4375 14.875H14V20.5625C14 20.804 14.196 21 14.4375 21C14.679 21 14.875 20.804 14.875 20.5625V14.875H20.5625C20.804 14.875 21 14.679 21 14.4375C21 14.196 20.804 14 20.5625 14Z" fill="#6B6D73"/>
+                </g>
+                <defs>
+                <clipPath id="clip0_312_58">
+                <rect width="28" height="28" fill="white"/>
+                </clipPath>
+                </defs>
+            </svg>
+        </button>
     </form>
     <p class="total">Потраченные калории за тренировку: <span class="value">{trainCalories}</span></p>
     <form class="step__form" on:submit|preventDefault={handleStepForm} bind:this={stepForm}>
         <p class="total">Пройдено за день, км:</p>
         <input 
             class="activity__input" type="text" name="steps" required autocomplete="off" 
-            on:change={() => stepForm.requestSubmit()} value={currentDateSteps ? currentDateSteps : '0'}
+            on:change={() => stepForm.requestSubmit()} value={currentDateSteps ? currentDateSteps : ''}
         >
         <p class="steps-calories">{stepsCalories ? stepsCalories : 0}</p>
     </form>
@@ -270,10 +275,17 @@
         margin-bottom: 2rem;
     }
 
+    .create, .delete {
+        position: absolute;
+        right: 0;
+        width: 2.5rem;
+        height: 2.53rem;
+        cursor: pointer;
+        transform: translateY(-50%);
+    }
+
     .create {
-        display: flex;
-        align-items: center;
-        justify-content: right;
+        top: 55%;
     }
 
     .create svg {
@@ -311,14 +323,7 @@
     }
 
     .delete {
-        position: absolute;
-        right: 0;
-        width: 2.5rem;
-        height: 2.53rem;
-        cursor: pointer;
-
         top: 50%;
-        transform: translateY(-50%);
     }
 
     .delete:hover {

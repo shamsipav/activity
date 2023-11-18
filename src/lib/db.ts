@@ -3,16 +3,16 @@ import pkg from 'pg'
 const { Pool } = pkg
 
 const dbConfig = {
-    host: 'localhost',
-    port: '5432',
-    user: 'postgres',
-    password:'postgresroot',
-    database: 'activity',
-    // host: 'postgres.c74073.h2',
+    // host: 'localhost',
     // port: '5432',
-    // user: 'c74073_activity_na4u_ru',
-    // password: 'YiPyuQemnabaq31',
-    // database: 'c74073_activity_na4u_ru'
+    // user: 'postgres',
+    // password:'postgresroot',
+    // database: 'activity',
+    host: 'postgres.c74073.h2',
+    port: '5432',
+    user: 'c74073_activity_na4u_ru',
+    password: 'YiPyuQemnabaq31',
+    database: 'c74073_activity_na4u_ru'
 }
 
 //console.log(dbConfig)

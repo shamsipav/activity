@@ -9,6 +9,8 @@ export async function load() {
         const allActivities: IActivity[] = await query('SELECT * FROM public.activities ORDER BY date DESC')
         const steps: IStep[] = await query('SELECT * FROM public.steps ORDER BY date DESC')
 
+        console.log("STEPS FROM POSTGRESQL: ", steps.rows)
+
         return {
             activities: result.rows,
             foodsByDate: foodsByDate.rows,

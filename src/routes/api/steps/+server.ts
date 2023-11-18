@@ -5,6 +5,7 @@ export const POST = (async ({ request }) => {
     const form = await request.formData()
     const steps = String(form.get('steps'))
     const date = form.get('date')
+    console.log('DATE BEFORE POST CALORIES: ', date)
 
     try {
         const exist = await query('SELECT * FROM public.steps WHERE date = $1', [date])
