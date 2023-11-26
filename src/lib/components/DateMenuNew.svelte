@@ -1,6 +1,6 @@
 <script lang="ts">
     import type { IActivity, IUnion } from '$lib/types'
-    import { getLocalISOTimeString } from '$lib/utils';
+    import { getLocalISOTimeString } from '$lib/utils'
     import { createEventDispatcher } from 'svelte'
     import { onMount } from 'svelte'
 

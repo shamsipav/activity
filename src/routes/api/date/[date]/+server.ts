@@ -8,7 +8,7 @@ export const GET = (async ({ params }) => {
         const activitiesByDateResult = await query('SELECT * FROM public.activities WHERE DATE = $1', [date])
         const stepsByDateResult = await query('SELECT * FROM public.steps WHERE DATE = $1', [date])
         const caloriesByDateResult = await query('SELECT * FROM public.foods WHERE DATE = $1', [date])
-        
+
         const unionObject: IUnion = {
             activities: activitiesByDateResult.rows,
             steps: stepsByDateResult.rows,

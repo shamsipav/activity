@@ -2,7 +2,7 @@
     import type { IActivity, IFood, IStep } from '$lib/types'
     import { fade } from 'svelte/transition'
     import { createEventDispatcher } from 'svelte'
-    import { getLocalISOTimeString, replaceCommaWithDot } from '$lib/utils';
+    import { getLocalISOTimeString, getLocaleDate, replaceCommaWithDot } from '$lib/utils'
 
     const dispatch = createEventDispatcher()
 
@@ -109,15 +109,15 @@
 
         // TODO: Переделать логику с проверкой содержимого message, добавить error = false/true в Notify
         if (response.ok) {
-            speedInputValue = null;
-            durationInputValue = null;
+            speedInputValue = null
+            durationInputValue = null
             e.target.reset()
 
             const newActivity = await response.json()
             activities = [...activities, newActivity]
 
             dispatch('added')
-            dispatch('notify', { message: `Активность (${newActivity.date.toLocaleDateString()}) успешно добавлена!` })
+            dispatch('notify', { message: `Активность (${getLocaleDate(newActivity.date)}) успешно добавлена!` })
         } else {
             dispatch('notify', { message: 'Возникла ошибка при добавлении активности' })
         }
@@ -140,7 +140,7 @@
             console.log(newSteps)
             dispatch('updated')
             dispatch('updatesteps', { steps: newSteps.steps })
-            dispatch('notify', { message: `Шаги (${newSteps.date.toLocaleDateString()}) успешно добавлены!` })
+            dispatch('notify', { message: `Шаги (${getLocaleDate(newSteps.date)}) успешно обновлены!` })
 
             stepsCalories = 0.5 * 48 * newSteps.steps
 
@@ -164,7 +164,7 @@
             const newCalories: IFood = await response.json()
             dispatch('updated')
             dispatch('updatefood', { calories: newCalories.calories })
-            dispatch('notify', { message: `Калории (${newCalories.date.toLocaleDateString()}) успешно обновлены!` })
+            dispatch('notify', { message: `Калории (${getLocaleDate(newCalories.date)}) успешно обновлены!` })
         } else {
             dispatch('notify', { message: 'Возникла ошибка при обновлении калорий' })
         }

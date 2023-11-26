@@ -1,6 +1,6 @@
 <script lang="ts">
     import { Activities, DateMenuNew, Modal, Notify, Statistic } from '$components'
-    import { choosedDateInStore } from '$lib/stores';
+    import { choosedDateInStore } from '$lib/stores'
     import type { IActivity, IFood, IModal, IStep, IUnion } from '$lib/types'
     import { getStats } from '$lib/utils'
     import type { PageData } from './$types'
@@ -35,19 +35,9 @@
         currentDate = unionObject.date
         steps = unionObject.steps
         foodsByDate = unionObject.foods
-
-        stats = getStats(allActivities, foodsByDate, steps, currentDate)
-        averageReceivedCalories = stats.averageReceivedCalories
-        averageSpentCalories = stats.averageSpentCalories
-
-        console.log(`+page.svelte: showActivitiesByDate(${currentDate.toLocaleDateString()}) completed`)
-        console.log('activities: ', activities)
-        console.log('steps: ', steps)
-        console.log('foodsByDate: ', foodsByDate)
-        console.log('')
     }
 
-    const getAllActivities = async () => {
+    const getAllActivities = async (date = currentDate) => {
         let response = await fetch('/api/database', {
             method: 'GET',
             headers: { accept: 'application/json' },
@@ -69,36 +59,25 @@
             steps = await responseSteps.json()
             foodsByDate = await responseFoods.json()
 
-            let stats = getStats(allActivities, foodsByDate, steps, currentDate)
+            let stats = getStats(allActivities, foodsByDate, steps, date)
             averageReceivedCalories = stats.averageReceivedCalories
             averageSpentCalories = stats.averageSpentCalories
-            
-            console.log('+page.svelte: getAllActivities() completed')      
-            console.log('allActivities: ', allActivities)   
-            console.log('steps: ', steps)
-            console.log('foodsByDate: ', foodsByDate)
-            console.log('averageRecievedCalories in this month: ', averageReceivedCalories) 
-            console.log('averageSpentCalories in this month: ', averageSpentCalories) 
-            console.log('')       
-        } 
-        else 
+        }
+        else
         {
             message = 'Возникла ошибка при получении всех активностей'
+            console.log(message)
             setTimeout(() => message = '', 2500)
         }
     }
 
     const updateSteps = (event: any) => {
-        console.log('updateStepsEvent target steps = ' + event.detail.steps)
-    
         let currentStep: any = steps.find(s => new Date(s.date).toLocaleDateString() == currentDate.toLocaleDateString())
         if (currentStep)
             currentStep.steps = event.detail.steps
     }
 
     const updateCalories = (event: any) => {
-        console.log('updateCalories target calories = ' + event.detail.calories)
-    
         let currentFood: any = foodsByDate.find(f => new Date(f.date).toLocaleDateString() == currentDate.toLocaleDateString())
         if (currentFood)
             currentFood.calories = event.detail.calories
@@ -106,20 +85,19 @@
 
     const notifyHandler = (event: any) => {
         message = event.detail.message
+        console.log('NOTIFY ' + message)
         setTimeout(() => message = '', 2500)
     }
 
     let currentDateForStats: Date = new Date()
-    const changeMonthHandler = (event: any) => {
+    const changeMonthHandler = async (event: any) => {
         currentDateForStats = event.detail.choosedDate
-        let stats = getStats(allActivities, foodsByDate, steps, currentDateForStats)
-        averageReceivedCalories = stats.averageReceivedCalories
-        averageSpentCalories = stats.averageSpentCalories
+        await getAllActivities(currentDateForStats)
+    }
 
-        console.log('+page.svelte: changeMonthHandler completed - ', currentDateForStats.toLocaleString('default', { month: 'long' }))  
-        console.log('averageReceivedCalories: ', averageReceivedCalories)  
-        console.log('averageSpentCalories: ', averageSpentCalories)
-        console.log('')
+    const calendarHandler = async () => {
+        await getAllActivities()
+        modal.open()
     }
 </script>
 
@@ -137,7 +115,7 @@
             on:updatesteps={updateSteps} 
             on:updatefood={updateCalories}
             on:notify={notifyHandler}
-            on:calendar={modal.open}
+            on:calendar={calendarHandler}
         />
     </div>
 </section>

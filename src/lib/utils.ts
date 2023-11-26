@@ -1,7 +1,7 @@
 import type { IActivity, IFood, IStep } from './types'
 
 export const getStats = (allActivities: IActivity[], foodsByDate: IFood[], steps: IStep[], choosedDate: Date) => {
-    
+
     allActivities = filteredListByMonth(allActivities, choosedDate.getMonth())
     foodsByDate = filteredListByMonth(foodsByDate, choosedDate.getMonth())
     steps = filteredListByMonth(steps, choosedDate.getMonth())
@@ -51,21 +51,21 @@ export const getStats = (allActivities: IActivity[], foodsByDate: IFood[], steps
     let spentCount = 0
     let spentStepCount = 0
 
-    let debug = false
+    const debug = false
 
     if (debug) {
         console.log('Start utils GetStats debug:')
         console.log('----------------------------')
-    
-        console.log('');
-        
+
+        console.log('')
+
         console.log('filtered allActivities: ', allActivities)
         console.log('filtered foodsByDate: ', foodsByDate)
         console.log('filtered steps: ', steps)
-    
-        console.log('');
+
+        console.log('')
     }
-    
+
 
     Object.entries(groupedActivities).forEach(([date, activities]) => {
         const caloriesInDate = calculateTotalCalories(activities)
@@ -77,7 +77,7 @@ export const getStats = (allActivities: IActivity[], foodsByDate: IFood[], steps
 
     foodsByDate.forEach(f => {
         if (f.calories > 0) {
-            totalReceivedCalories += f.calories
+            totalReceivedCalories += +f.calories
             receivedCount++
         }
     })
@@ -98,9 +98,9 @@ export const getStats = (allActivities: IActivity[], foodsByDate: IFood[], steps
         console.log('averageReceivedCalories: ', averageReceivedCalories)
         console.log('averageSpentCalories: ', averageSpentTrainCalories)
         console.log('averageSpentStepCalories: ', averageSpentStepCalories)
-    
+
         console.log('')
-    
+
         console.log('End utils GetStats debug:')
         console.log('----------------------------')
     }
@@ -113,7 +113,9 @@ const filteredListByMonth = (list: any[], month: number) => {
 }
 
 export const getLocalISOTimeString = (date: Date) => {
-    return new Date(date.getTime() - (date.getTimezoneOffset() * 60000)).toISOString();
+    return new Date(date.getTime() - (date.getTimezoneOffset() * 60000)).toISOString()
 }
 
-export const replaceCommaWithDot = (inputString: string) => inputString.replace(/,/g, '.');
+export const replaceCommaWithDot = (inputString: string) => inputString.replace(/,/g, '.')
+
+export const getLocaleDate = (date: any) => new Date(date).toLocaleDateString()
